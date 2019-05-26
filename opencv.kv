@@ -1,0 +1,271 @@
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+#: import ListItemButton kivy.uix.listview.ListItemButton
+
+<CustomToggleButton@ToggleButton>:
+    background_normal: ''
+    background_color: .20, .41, .49, 1
+
+
+<CustomButton@Button>:
+    background_normal: ''
+    background_color: .20, .41, .49, 1
+
+
+<CustomLabel@Label>:
+    bold: True
+    font_size: 15
+
+    canvas.before:
+        Color:
+            rgba: .54, .73, .82, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<ListItemButton>:
+    on_press: app.select(*args)
+
+
+<StartScreen>:
+    id: _startScreen
+    name: 'startScreen'
+
+    canvas.before:
+        Color:
+            rgba: .78, .90, .95, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'center'
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: .2, .1
+
+            CustomButton:
+                text: 'Start'
+                on_press: root.manager.current = 'mainScreen'
+
+
+<LoginPopup>:
+    id: _loginPopup
+    title: 'Login Form'
+    size_hint: .6, .5
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 1
+
+        TextInput:
+            id: _loginName
+            hint_text: 'Username'
+            focus: True
+            multiline: False
+
+        TextInput:
+            id: _loginPassword
+            hint_text: 'Password'
+            multiline: False
+            password: True
+
+        CustomButton:
+            text: 'LOG IN'
+            on_press: root.login(_loginName.text, _loginPassword.text)
+            on_release: 
+                if root.isAdmin: app.root.current = 'adminScreen'
+                _loginPopup.dismiss()
+
+        CustomButton:
+            text: 'close'
+            on_press: _loginPopup.dismiss()
+
+<LoadingPopup>:
+    id: _loadingPopup
+    title: 'Loading'
+    auto_dismiss: False
+    size_hint: .6, .5
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        ProgressBar:
+            id: _loadingProgressBar
+            min: 0
+            max: 100
+            value: 0
+
+<FaceTrainPopup>:
+    id: _faceTrainerPopup
+    title: 'Face Train'
+    auto_dismiss: False
+    size_hint: .6, .5
+    
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        CustomLabel:
+            text: 'Look at the camera and Wait ...'
+
+
+<AdminScreen>:
+    id: _adminScreen
+    name: 'adminScreen'
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 1
+
+        CustomButton:
+            text: 'main'
+            on_press: root.manager.current = 'mainScreen'
+            size_hint: 1, .1
+
+        TabbedPanel:
+            do_default_tab: False
+            size_hint: 1, .9
+
+            TabbedPanelItem:
+                background_normal: ''
+                background_color: .20, .41, .49, 1
+                text: 'Train'
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 1
+                    canvas.before:
+                        Color:
+                            rgba: .78, .90, .95, 1
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                    AnchorLayout:
+                        id: _adminDetector
+                        anchor_x: 'center'
+                        anchor_y: 'center'
+                        size_hint: 1, .8
+
+                    AnchorLayout:
+                        anchor_x: 'center'
+                        anchor_y: 'center'
+                        size_hint: 1, .2
+
+                        BoxLayout:
+                            orientation: 'vertical'
+                            spacing: 1
+                            size_hint: .6, 1
+                            
+                            TextInput:
+                                id: _username
+                                hint_text: 'Username'
+                                multiline: False
+                                
+                            CustomButton:
+                                text: 'Recognition'
+                                on_press: root.recognitionFace()
+
+            TabbedPanelItem:
+                background_normal: ''
+                background_color: .20, .41, .49, 1
+                text: 'delete'
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    spacing: 1
+
+                    canvas.before:
+                        Color:
+                            rgba: .78, .90, .95, 1
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                    ListView:
+                        size_hint: 1, .9
+                        adapter:
+                            ListAdapter(data=root.imageNameList, 
+                            selection_mode='single',
+                            allow_empty_selection=False,
+                            cls=ListItemButton)
+
+                    CustomButton:
+                        size_hint: 1, .1
+                        text: 'delete'
+                        on_press: app.deleteImage()
+
+<MainScreen>:
+    id: _mainScreen
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 1
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, .1
+
+            CustomButton:
+                text: 'Admin Pannel'
+                on_press: root.openLoginPopup()
+
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: 1
+            size_hint: 1, .7
+
+            AnchorLayout:
+                id: _mainDetector
+                anchor_x: 'center'
+                anchor_y: 'center'
+                size_hint: .7, 1
+
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: 1
+                size_hint: .3, 1
+
+                CustomLabel:
+                    size_hint: 1, .1
+                    text: 'Status Bar'
+
+                BoxLayout:
+                    orientation: 'horizontal'
+
+                    CustomLabel:
+                        text: 'Name :'
+
+                    CustomLabel:
+                        id: _nameNow
+                        text: 'None'
+
+                BoxLayout:
+                    orientation: 'horizontal'
+
+                    CustomLabel:
+                        text: 'Confidence: '
+
+                    CustomLabel:
+                        id: _confidenceNow
+                        text: '0'
+        
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 1
+            size_hint: 1, .2
+
+            CustomToggleButton:
+                text: 'Face'
+                on_press: root.playFaceDetector()
+
+            CustomToggleButton:
+                text: 'Eyes'
+                on_press: root.playEyesDetector()
+
+            CustomToggleButton:
+                text: 'Smile'
+                on_press: root.playSmileDetector()                
